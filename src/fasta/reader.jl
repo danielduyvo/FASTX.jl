@@ -155,7 +155,7 @@ function seekrecord(reader::Reader, i::Integer)
     nothing
 end
 
-const UNALLOWED_BYTESET = Val(ByteSet((UInt8('\n'), UInt8('\r'), UInt8('>'))))
+const UNALLOWED_BYTESET = UInt8['\n', '\r', '>']
 
 """
     extract(reader::Reader, name::AbstractString, range::Union{Nothing, UnitRange})
@@ -220,7 +220,7 @@ function extract(
     # Now check that there are no bad bytes in our buffer
     # Note: This ByteSet must correspond to the allowed bytes in
     # the FASTA machine to ensure we can seek the same FASTA files we can read
-    badpos = memchr(buffer, UNALLOWED_BYTESET)
+    badpos = findfirst(x -> x ∈ UNALLOWED_BYTESET, buffer)
     if badpos !== nothing
         error("Invalid byte in FASTA sequence line: $(buffer[badpos])")
     end
